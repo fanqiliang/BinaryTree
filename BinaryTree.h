@@ -14,7 +14,13 @@ typedef struct Linktable {
     struct  Linktable *next;
     char    data[20];
     int     Num;
+    int     key;
+
 }Linktable;
+
+int Partition(int list[][2], int low, int high);
+
+void QuickSort(int list[][2], int low, int high);
 
 void CreateTree();
 
