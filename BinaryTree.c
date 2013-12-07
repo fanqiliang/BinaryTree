@@ -3,30 +3,16 @@
 #include <string.h>
 
 
-FILE * OpenTxt() {
-
-    FILE *fp;
-
-    fp = fopen("/Users/fanqiliang/sandbox/fan.txt", "rt");
-    if (fp == NULL) {
-        printf("FAILED!!!\n");
-        exit(0);
-    }
-    return fp;
-}
-void GetInfo() {
-
+void GetInfo(FILE *fp) {
     char ch;
-    char ReadInfo[20];
-    char Temp[20];
+    char ReadInfo[100];
+    char Temp[100];
     int  temp[10];
-    int  Storage[1000][2];
+    int  Storage[1000000][2];
     int  i = 0;
     int  j = 0;
     int  t = 0;
     int  s = 0;
-
-    FILE * fp = OpenTxt();
 
     Linktable * Head = NULL;
     Linktable * pNode = NULL;
@@ -34,15 +20,19 @@ void GetInfo() {
 
     ch = fgetc(fp);
     while (ch != EOF) {
-        while (ch == '\t' || ch == ' ' || ch == ',' 
-                || ch == '.' || ch == '\n' || ch == '\r') {
+        while (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+                || (ch >= '0' && ch <= '9') || ch == '-')) {
+            if (ch == EOF)
+                break;
             ch = fgetc(fp);
         }
+        if (ch == EOF)
+            break;
         ReadInfo[i] = ch;
         i++;
         ch = fgetc(fp);
-        if (ch == ' ' || ch == '\n' 
-            || ch == '\t' || ch == ',' || ch == '.' || ch == '\r') {
+        if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+                || (ch >= '0' && ch <= '9') || ch == '-')) {
             ReadInfo[i] = '\0';
             if (Head == NULL) {
                 Head = (Linktable *)malloc(sizeof(struct Linktable));
@@ -51,7 +41,6 @@ void GetInfo() {
                 strcpy(Head->data, ReadInfo);
                 (Head->Num)++;
                 Head->key = ++t;
-                printf("%d  \n", Head->key);
                 Storage[t][0] = Head->Num;
                 Storage[t][1] = Head->key;
                 t++;
@@ -60,7 +49,7 @@ void GetInfo() {
             } else {
                 pNode = Head;
                 s = 1;
-                while(pNode != NULL) {
+                while (pNode != NULL) {
                     if (strcasecmp(pNode->data, ReadInfo) == 0) {
                         (pNode->Num)++;
                         Storage[s][0] = pNode->Num;
@@ -93,15 +82,16 @@ void GetInfo() {
         }
     }
     qNode = Head;
-    while(qNode != NULL) {
+    while (qNode != NULL) {
         printf("%s ", qNode->data);
-        printf("%d\n", qNode->Num);
+        printf("%d ", qNode->Num);
+        printf("%d\n", qNode->key);
         qNode = qNode->next;
     }
     printf("\n");
     QuickSort(Storage, 0, t-2);
     printf("The top 10 words is following!!!!!!\n");
-    for(j = t-2; j > t-12; j--) {
+    for (j = t-2; j > t-12; j--) {
         pNode = Head;
         while (pNode != NULL) {
             if (pNode->key == Storage[j][1]) {
@@ -147,6 +137,12 @@ void QuickSort(int list[][2], int low, int high) {
     }
 }
 
-int main() {
-    GetInfo(); 
+int main(int argc, char *argv[]) {
+    FILE *fp;
+    fp = fopen(argv[1], "rt");
+    if (fp == NULL) {
+        printf("FAILED!!!\n");
+        exit(0);
+    }
+    GetInfo(fp); 
 } 

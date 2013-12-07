@@ -12,7 +12,7 @@ typedef struct TreeNode {
 
 typedef struct Linktable {
     struct  Linktable *next;
-    char    data[20];
+    char    data[100];
     int     Num;
     int     key;
 
@@ -24,8 +24,7 @@ void QuickSort(int list[][2], int low, int high);
 
 void CreateTree();
 
-void GetInfo();
+void GetInfo(FILE *fp);
 
-FILE * OpenTxt();
 #endif
 
