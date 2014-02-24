@@ -76,14 +76,14 @@ Node * NULLNODE() {
 }
 
 Node * CreateRoot(Node *node, int key, char *keywords) {
-    node = (struct Node *)malloc(sizeof(struct Node));
-    node->color = BLACK;
-    node->key = key;
-    strcpy(node->keywords, keywords);
-    node->left = NullNode;
-    node->right = NullNode;
-    node->parent = NULL;
-    return node;
+    struct Node *pnode = (struct Node *)malloc(sizeof(struct Node));
+    pnode->color = BLACK;
+    pnode->key = key;
+    strcpy(pnode->keywords, keywords);
+    pnode->left = NullNode;
+    pnode->right = NullNode;
+    pnode->parent = NULL;
+    return pnode;
 }
 
 Node * CreateNode(Node *pnode, int key, char keywords[]) {
@@ -103,8 +103,10 @@ void LeftRotate(Node *node) {
     if (tNode->left != NullNode)
         tNode->left->parent = node;
     tNode->parent = node->parent;
-    if (node->parent == NULL)
-        Root = CreateRoot(tNode->parent, tNode->key, tNode->keywords);
+    if (node->parent == NULL) {
+        Root = tNode;
+        Root->parent = NULL;
+    }
     else if (node->parent->left == node)
         node->parent->left = tNode;
     else
@@ -120,8 +122,10 @@ void RightRotate(Node *node) {
     if (tNode->right != NullNode)
         tNode->right->parent = node;
     tNode->parent = node->parent;
-    if (node->parent == NULL)
-        Root = CreateRoot(tNode->parent, tNode->key, tNode->keywords);
+    if (node->parent == NULL) {
+        Root = tNode;
+        Root->parent = NULL;
+    }
     else if (node->parent->right == node)
         node->parent->right = tNode;
     else
@@ -132,10 +136,11 @@ void RightRotate(Node *node) {
 
 void InsertFixUp(Node * node) {
     struct Node *pnode = node;
-    while (pnode->parent->color == RED) {
+    struct Node *tNode = NULL;
+    while (pnode->parent->color == RED && pnode->parent != NULL) {
         if (pnode->parent != NULL && pnode->parent->parent != NULL) {
             if (pnode->parent->parent->left == pnode->parent) {
-                struct Node *tNode = pnode->parent->parent->right;
+                tNode = pnode->parent->parent->right;
                 if (tNode->color == RED) {
                     tNode->color = BLACK;
                     pnode->parent->color = BLACK;
@@ -147,9 +152,9 @@ void InsertFixUp(Node * node) {
                 }
                 pnode->parent->color = BLACK;
                 pnode->parent->parent->color = RED;
-                RightRotate(node);
+                RightRotate(pnode->parent->parent);
             } else {
-                struct Node *tNode = pnode->parent->parent->left;
+                tNode = pnode->parent->parent->left;
                 if (tNode->color == RED) {
                     tNode->color = BLACK;
                     pnode->parent->color = BLACK;
@@ -161,9 +166,10 @@ void InsertFixUp(Node * node) {
                 }
                 pnode->parent->color = BLACK;
                 pnode->parent->parent->color = RED;
-                LeftRotate(node);
+                LeftRotate(pnode->parent->parent);
             }
-        }
+        } else 
+            break;
     }
     Root->color = BLACK;
 }
@@ -272,6 +278,7 @@ void TreeInsert(int key, char * keywords) {
     struct Node *node = NullNode;
     struct Node *pnode = NULL;
     node = Root;
+    int flag = 1;
     while (node != NullNode) {
         if (node->key >= key) {
             pnode = node;
@@ -280,9 +287,14 @@ void TreeInsert(int key, char * keywords) {
         else {
             pnode = node;
             node = node->right;
+            flag = 0;
         }
     }
     node = CreateNode(pnode, key, keywords);
+    if (flag == 1)
+        node->parent->left = node;
+    else
+        node->parent->right = node;
     InsertFixUp(node);
 }
 
@@ -301,13 +313,15 @@ void Print() {
     if (Root == NULL)
         printf("The file is null.");
     else {
-        node = Root->right;
+        node = Root;
     }
     while (node != NullNode) {
         if (node->right != NullNode)
             node = node->right;
-        printf("The top 1 is and its number is %d\n", node->key);
+        else
+            break;
     }
+    printf("The top 1 is and its number is %d\n", node->key);
 }
 
 
