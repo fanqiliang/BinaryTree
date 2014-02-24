@@ -2,16 +2,72 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
-void NULLNODE() {
-    NullNode = (Node *)malloc(sizeof(struct Node));
-    NullNode->color = BLACK;
-    NullNode->key = 0;
-    NullNode->left = NULL;
-    NullNode->right = NULL;
-    NullNode->parent = NULL;
+struct LNode *CreateLNode(LNode *node, char *word) {
+    node = (LNode *)malloc(sizeof(struct LNode));
+    node->next = NULL;
+    node->key = 1;
+    strcpy(node->keywords, word);
+    return node;
 }
-struct Node * CreateRoot(char keywords[]) {
+
+void ReadWordInfo(char *word) {
+    struct LNode *node = NULL;
+    if (Head != NULL) {
+        Head = (LNode *)malloc(sizeof(struct LNode));
+        strcpy(Head->keywords, word);
+        Head->key = 1;
+        Head->next = NULL;
+    }
+    node = Head;
+    while (node != NULL) {
+        if (strcmp(node->keywords, word) == 0)
+            node->key++;
+        else {
+            if (node->next == NULL)
+                node = CreateLNode(node, word);
+            else
+                node = node->next;
+        }
+    }
+}
+
+void ReadWords(FILE *fp) {
+    char *word;
+    char ch;
+    int i = 0;
+
+    ch = fgetc(fp);
+    while(ch != EOF) {
+        while (!(isalnum(ch))) {
+            if (ch == EOF)
+                return;
+            ch = fgetc(fp);
+        }
+        if (ch == EOF)
+            return;
+        word[i] = ch;
+        i++;
+        ch = fgetc(fp);
+        if (!(isalnum(ch))) {
+            word[i] = '\0';
+            ReadWordInfo(word);
+        }
+    }
+    return;
+}
+
+Node * NULLNODE() {
+    Node *nullnode = (Node *)malloc(sizeof(struct Node));
+    nullnode->color = BLACK;
+    nullnode->key = 0;
+    nullnode->left = NULL;
+    nullnode->right = NULL;
+    nullnode->parent = NULL;
+    return nullnode;
+}
+Node * CreateRoot(char keywords[]) {
     Root = (struct Node *)malloc(sizeof(struct Node));
     Root->color = BLACK;
     Root->key = 1;
@@ -22,7 +78,7 @@ struct Node * CreateRoot(char keywords[]) {
     return Root;
 }
 
-struct Node * CreateNode(Node *pnode, char keywords[]) {
+Node * CreateNode(Node *pnode, char keywords[]) {
     struct Node *node = (Node *)malloc(sizeof(struct Node));
     node->color = RED;
     node->key = 1;
@@ -104,13 +160,13 @@ void InsertFixup(Node * Root, Node * node) {
     Root->color = BLACK;
 }
 
-struct Node * TreeMinimum(Node *node) {
+Node * TreeMinimum(Node *node) {
     while (node->left != NullNode)
         node = node->left;
     return node;
 }
 
-struct Node * TreeSuccessor(Node *node) {
+Node * TreeSuccessor(Node *node) {
     struct Node *tNode = NULL;
     if (node->right != NullNode)
         return TreeMinimum(node->right);
@@ -201,6 +257,7 @@ void DeleteNode(Node *Root, Node *node) {
 }
 
 void TreeInsert(Node *Root, char keywords[]) {
+    NullNode = NULLNODE();
     struct Node *pnode = NullNode;
     if (Root == NullNode) {
         Root = CreateRoot(keywords);
@@ -247,9 +304,14 @@ void TreeInsert(Node *Root, char keywords[]) {
 }
 
 
-int main() {
+int main(int argc, char *argv[]) {
     FILE *fp;
-    //fp = fopen(argv[1], "rt");
-    //if ()
+    fp = fopen(argv[1], "rt");
+    if (fp == NULL) {
+        printf("The file does't exit.\n");
+        exit(0);
+    }
+    ReadWords(fp);
+    fclose(fp);
     return 0;
 }
