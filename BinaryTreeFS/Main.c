@@ -4,7 +4,6 @@
 #include <string.h>
 #include <ctype.h>
 
-
 struct LNode *CreateLNode(char *word) {
     struct LNode *node = (LNode *)malloc(sizeof(struct LNode));
     node->next = NULL;
@@ -69,6 +68,7 @@ Node * NULLNODE() {
     Node *nullnode = (Node *)malloc(sizeof(struct Node));
     nullnode->color = BLACK;
     nullnode->key = 0;
+    nullnode->state = UNREAD;
     nullnode->left = NULL;
     nullnode->right = NULL;
     nullnode->parent = NULL;
@@ -79,6 +79,7 @@ Node * CreateRoot(Node *node, int key, char *keywords) {
     struct Node *pnode = (struct Node *)malloc(sizeof(struct Node));
     pnode->color = BLACK;
     pnode->key = key;
+    pnode->state = UNREAD;
     strcpy(pnode->keywords, keywords);
     pnode->left = NullNode;
     pnode->right = NullNode;
@@ -90,6 +91,7 @@ Node * CreateNode(Node *pnode, int key, char keywords[]) {
     struct Node *node = (Node *)malloc(sizeof(struct Node));
     node->color = RED;
     node->key = key;
+    node->state = UNREAD;
     strcpy(node->keywords, keywords);
     node->left = NullNode;
     node->right = NullNode;
@@ -317,6 +319,31 @@ void CreateTree() {
     }
 }
 
+Node * TravNode(Node *node) {
+    if (node->left != NullNode) {
+        node = node->left;
+        while (node != NullNode) {
+            if (node->right != NullNode)
+                node = node->right;
+            else
+                break;
+        }
+        return node;
+    } else {
+        if (node->parent != NULL) {
+            node = node->parent;
+            while (node->state == READ) {
+                node = node->parent;
+                if (node == NULL)
+                    return NULL;
+            }
+            return node;
+        }
+        else
+            return NULL;
+    }
+}
+
 void Print() {
     struct Node *node = NULL;
     if (Root == NULL)
@@ -330,7 +357,18 @@ void Print() {
         else
             break;
     }
-    printf("The top 1 is and its number is %d\n", node->key);
+    printf("The highest frequency of 10 words and the number of them appear:\n");
+    int i = 1;
+    while (i <= 10) {
+        printf("The top %d is %s    %d\n", i, node->keywords, node->key);
+        node->state = READ;
+        node = TravNode(node);
+        if (node == NULL || node == NullNode) {
+            printf("There are not 10 words.\n");
+            break;
+        }
+        i++;
+    }
 }
 
 
