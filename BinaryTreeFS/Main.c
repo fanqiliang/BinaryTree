@@ -137,7 +137,7 @@ void RightRotate(Node *node) {
 void InsertFixUp(Node * node) {
     struct Node *pnode = node;
     struct Node *tNode = NULL;
-    while (pnode->parent->color == RED && pnode->parent != NULL) {
+    while (pnode->parent != NULL && pnode->parent->color == RED) {
         if (pnode->parent != NULL && pnode->parent->parent != NULL) {
             if (pnode->parent->parent->left == pnode->parent) {
                 tNode = pnode->parent->parent->right;
@@ -146,13 +146,16 @@ void InsertFixUp(Node * node) {
                     pnode->parent->color = BLACK;
                     pnode->parent->parent->color = RED;
                     pnode = pnode->parent->parent;
-                } else if (pnode->parent->right == pnode) {
-                    pnode = pnode->parent;
-                    LeftRotate(pnode);
+                } else if(tNode->color == BLACK) {
+                    if (pnode->parent->right == pnode) {
+                        pnode = pnode->parent;
+                        LeftRotate(pnode);
+                    } else {
+                        pnode->parent->color = BLACK;
+                        pnode->parent->parent->color = RED;
+                        RightRotate(pnode->parent->parent);
+                    }
                 }
-                pnode->parent->color = BLACK;
-                pnode->parent->parent->color = RED;
-                RightRotate(pnode->parent->parent);
             } else {
                 tNode = pnode->parent->parent->left;
                 if (tNode->color == RED) {
@@ -160,13 +163,18 @@ void InsertFixUp(Node * node) {
                     pnode->parent->color = BLACK;
                     pnode->parent->parent->color = RED;
                     pnode = pnode->parent->parent;
-                } else if (pnode->parent->left == pnode) {
-                    pnode = pnode->parent;
-                    RightRotate(pnode);
+                    if (pnode->parent == NULL)
+                        break;
+                } else if (tNode->color == BLACK) {
+                    if (pnode->parent->left == pnode) {
+                        pnode = pnode->parent;
+                        RightRotate(pnode);
+                    } else {
+                        pnode->parent->color = BLACK;
+                        pnode->parent->parent->color = RED;
+                        LeftRotate(pnode->parent->parent);
+                    }
                 }
-                pnode->parent->color = BLACK;
-                pnode->parent->parent->color = RED;
-                LeftRotate(pnode->parent->parent);
             }
         } else 
             break;
@@ -283,6 +291,7 @@ void TreeInsert(int key, char * keywords) {
         if (node->key >= key) {
             pnode = node;
             node = node->left;
+            flag = 1;
         }
         else {
             pnode = node;
