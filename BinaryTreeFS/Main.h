@@ -5,10 +5,13 @@
 #define MAX 100
 #define RED -1
 #define BLACK -2
+#define READ -3
+#define UNREAD -4
 
 typedef struct Node {
     int color;
     int key;
+    int state;
     char keywords[MAX];
     struct Node * left;
     struct Node * right;
@@ -44,5 +47,7 @@ void DeleteFixUp(Node *node);
 void DeleteNode(Node *node);
 void TreeInsert(int key, char *keywords);
 void CreateTree();
+Node *TravNode(Node *node);
+void Print();
 
 #endif
