@@ -4,7 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 
-struct LNode *CreateLNode(char *word) {
+struct LNode *CreateLNode(char *word) { /*create a new linktabel to save words' information*/
     struct LNode *node = (LNode *)malloc(sizeof(struct LNode));
     node->next = NULL;
     node->key = 1;
@@ -184,12 +184,14 @@ void InsertFixUp(Node * node) {
     Root->color = BLACK;
 }
 
+/*not use this function*/
 Node * TreeMinimum(Node *node) {
     while (node->left != NullNode)
         node = node->left;
     return node;
 }
 
+/*not use this function*/
 Node * TreeSuccessor(Node *node) {
     struct Node *tNode = NULL;
     if (node->right != NullNode)
@@ -202,6 +204,7 @@ Node * TreeSuccessor(Node *node) {
     return tNode;
 }
 
+/*not use this function*/
 void DeleteFixUp(Node *node) {
     struct Node * wNode = NULL;
     while (node != Root && node->color == BLACK) {
@@ -256,6 +259,7 @@ void DeleteFixUp(Node *node) {
     node->color = BLACK;
 }
 
+/*not use this function*/
 void DeleteNode(Node *node) {
     struct Node *tNode = NULL;
     struct Node *pNode = NULL;
@@ -288,7 +292,7 @@ void TreeInsert(int key, char * keywords) {
     struct Node *node = NullNode;
     struct Node *pnode = NULL;
     node = Root;
-    int flag = 1;
+    int flag = 1; /*0 is right child and 1 is left child*/
     while (node != NullNode) {
         if (node->key >= key) {
             pnode = node;
@@ -309,9 +313,10 @@ void TreeInsert(int key, char * keywords) {
     InsertFixUp(node);
 }
 
+/*Create a binary tree*/
 void CreateTree() {
     struct LNode *node = NULL;
-    NullNode = NULLNODE();
+    NullNode = NULLNODE();   /*its function like null but it has some information*/
     node = Head;
     while (node != NULL) {
         TreeInsert(node->key, node->keywords);
@@ -319,6 +324,7 @@ void CreateTree() {
     }
 }
 
+/*Read words according to its key order*/
 Node * TravNode(Node *node) {
     if (node->left != NullNode) {
         node = node->left;
@@ -344,6 +350,7 @@ Node * TravNode(Node *node) {
     }
 }
 
+/*print the top 10 words*/
 void Print() {
     struct Node *node = NULL;
     if (Root == NULL)
